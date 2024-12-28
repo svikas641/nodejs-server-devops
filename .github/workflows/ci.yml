@@ -44,11 +44,13 @@ jobs:
       # Step 3: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: ap-south-1 # Specify the AWS region
 
       # Step 4: Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t my-app:${{ github.sha }} .
+          docker build -t nodejs-server-devops:${{ github.sha }} .
 
       # Step 5: Tag Docker image for ECR
       - name: Tag Docker image
