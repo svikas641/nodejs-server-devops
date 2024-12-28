@@ -37,11 +37,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Docker Buildx
+      # Step 2: Get short SHA (last 8 characters)
+      - name: Get short SHA
+        id: get_sha
+        run: |
+          SHORT_SHA=$(git rev-parse --short=8 HEAD)
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
+
+      # Step 3: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Step 3: Log in to Amazon ECR
+      # Step 4: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         env:
@@ -49,17 +56,17 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # Use GitHub secret
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Use GitHub secret
 
-      # Step 4: Build the Docker image
+      # Step 5: Build the Docker image with short SHA
       - name: Build Docker image
         run: |
-          docker build -t nodejs-server-devops:${{ github.sha }} .
+          docker build -t nodejs-server-devops:${SHORT_SHA} .
 
-      # Step 5: Tag Docker image for ECR
+      # Step 6: Tag Docker image for ECR
       - name: Tag Docker image
         run: |
-          docker tag nodejs-server-devops:${{ github.sha }} 508314231726.dkr.ecr.ap-south-1.amazonaws.com/nodejs-server-devops:${{ github.sha }}
+          docker tag nodejs-server-devops:${SHORT_SHA} 508314231726.dkr.ecr.ap-south-1.amazonaws.com/nodejs-server-devops:${SHORT_SHA}
 
-      # Step 6: Push Docker image to ECR
+      # Step 7: Push Docker image to ECR
       - name: Push Docker image to ECR
         run: |
-          docker push 508314231726.dkr.ecr.ap-south-1.amazonaws.com/nodejs-server-devops:${{ github.sha }}
+          docker push 508314231726.dkr.ecr.ap-south-1.amazonaws.com/nodejs-server-devops:${SHORT_SHA}
