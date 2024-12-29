@@ -10,6 +10,9 @@ app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello, World!" });
 });
 
+app.get("/api/bye", (req, res) => {
+  res.json({ message: "Bye, World!" });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
